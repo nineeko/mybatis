@@ -28,4 +28,78 @@
          WHERE orderable_status = 'Y'
          ORDER BY menu_code
     </select>
+    <!--
+        <association> : 1:1 관계의 매핑에서 사용되는 엘리먼트
+    -->
+    <resultMap id="categoryResultMap" type="CategoryDTO">
+        <id property="categoryCode" column="category_code"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="refCategoryCode" column="ref_category_code"/>
+    </resultMap>
+    <resultMap id="menuAndCategoryResultMap" type="MenuAndCategoryDTO">
+        <id property="menuCode" column="menu_code"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="menuPrice" column="menu_price"/>
+        <result property="orderableStatus" column="orderable_status"/>
+        <!--
+            id, result보다 위에 작성되면 컴파일 에러 발생
+            (1) 별도의 resultMap을 참조해서 매핑
+            (2) 엘리먼트 내부에 작성해서 매핑
+        -->
+<!--        <association property="category" resultMap="categoryResultMap"/>-->
+        <association property="category" javaType="CategoryDTO">
+            <id property="categoryCode" column="category_code"/>
+            <result property="categoryName" column="category_name"/>
+            <result property="refCategoryCode" column="ref_category_code"/>
+
+        </association>
+    </resultMap>
+    <select id="selectResultMapAssociationTest" resultMap="menuAndCategoryResultMap">
+        SELECT
+                a.menu_code
+              , a.menu_name
+              , a.menu_price
+              , a.orderable_status
+              , b.category_code
+              , b.category_name
+              , b.ref_category_code
+          FROM tbl_menu a
+          JOIN tbl_category b ON (a.category_code = b.category_code)
+         WHERE a.orderable_status = 'Y'
+         ORDER BY a.menu_code
+    </select>
+
+    <!-- <collection> : 1:N의 관계를 매핑-->
+    <!--
+           id, result보다 위에 작성되면 컴파일 에러 발생
+           (1) 별도의 resultMap을 참조해서 매핑
+           (2) 엘리먼트 내부에 작성해서 매핑
+       -->
+    <resultMap id="categoryAndMenuResultMap" type="CategoryAndMenuDTO">
+        <id property="categoryCode" column="category_code"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="refCategoryCode" column="ref_category_code"/>
+<!--        <collection property="menuList" resultMap="menuResultMap2"/>-->
+        <collection property="menuList" resultMap="menuResultMap2">
+            <id property="menuCode" column="menu_code"/>
+            <result property="menuName" column="menu_name"/>
+            <result property="menuPrice" column="menu_price"/>
+            <result property="categoryCode" column="category_code"/>
+            <result property="orderableStatus" column="orderable_status"/>
+        </collection>
+    </resultMap>
+    <select id="selectResultMapCollectionTest" resultMap="categoryAndMenuResultMap">
+        SELECT
+                a.category_code
+              , a.category_name
+              , a.ref_category_code
+              , b.menu_code
+              , b.menu_name
+              , b.menu_price
+              , b.orderable_status
+          FROM tbl_category a
+          LEFT JOIN tbl_menu b ON (a.category_code = b.category_code)
+         WHERE b.orderable_status = 'Y'
+         ORDER BY a.category_code
+    </select>
 </mapper>
