@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ohgiraffers.section01.xmlmapper.ElementTestMapper">
+    <!-- 1. resultMap 테스트 -->
+    <!--
+        autoMapping : 조회 결과를 type에 자동 매핑할지 선택
+        extends : 작성된 resultMap를 확장(상속)하는 resultMap 작성
+    -->
+    <resultMap id="menuResultMap1" type="MenuDTO" autoMapping="false">
+        <id property="menuCode" column="menu_code"/>
+        <result property="menuName" column="menu_name"/>
+
+    </resultMap>
+    <resultMap id="menuResultMap2" type="MenuDTO" extends="menuResultMap1" autoMapping="false">
+        <result property="menuPrice" column="menu_price"/>
+        <result property="categoryCode" column="category_code"/>
+    </resultMap>
+    <select id="selectResultMapTest" resultMap="menuResultMap2">
+        SELECT
+                menu_code
+              , menu_name
+              , menu_price
+              , category_code
+              , orderable_status
+          FROM tbl_menu
+         WHERE orderable_status = 'Y'
+         ORDER BY menu_code
+    </select>
+</mapper>
